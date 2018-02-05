@@ -13,4 +13,5 @@
 # limitations under the License.
 #
 
-version = '1.9.0'
+# https://www.python.org/dev/peps/pep-0440/#local-version-identifiers
+version = '1.9.0+hmx.1'
