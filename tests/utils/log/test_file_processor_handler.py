@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import multiprocessing
 import shutil
 import os
 import unittest
@@ -104,6 +105,39 @@ class TestFileProcessorHandler(unittest.TestCase):
 
         with freeze_time(date1):
             handler.set_context(filename=os.path.join(self.dag_dir, "log1"))
+
+    def test_concurrency(self):
+        start_event = multiprocessing.Event()
+
+        def _process_target(start_event):
+            start_event.wait()
+
+            handler = FileProcessorHandler(base_log_folder=self.base_log_folder,
+                                        filename_template=self.filename)
+
+        link = os.path.join(self.base_log_folder, "latest")
+
+        date = (timezone.utcnow() + timedelta(days=1)).strftime("%Y-%m-%d")
+        with freeze_time(date):
+            processes = []
+            n_processes = 200
+
+            for _ in range(0, n_processes):
+                process = multiprocessing.Process(target=_process_target, args=(start_event,))
+                process.start()
+
+                processes += [process]
+
+            # Start all processes at the same time
+            start_event.set()
+
+            for thread in processes:
+                process.join()
+                self.assertEqual(process.exitcode, 0)
+
+            self.assertTrue(os.path.islink(link))
+            self.assertEqual(os.path.basename(os.readlink(link)), date)
+
 
     def tearDown(self):
         shutil.rmtree(self.base_log_folder, ignore_errors=True)
