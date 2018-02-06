@@ -103,8 +103,11 @@ class FileProcessorHandler(logging.Handler):
             # if symlink exists but is stale, update it
             if os.path.islink(latest_log_directory_path):
                 if os.readlink(latest_log_directory_path) != log_directory:
-                    os.unlink(latest_log_directory_path)
-                    os.symlink(log_directory, latest_log_directory_path)
+                    try:
+                        os.unlink(latest_log_directory_path)
+                        os.symlink(log_directory, latest_log_directory_path)
+                    except:
+                        self.log.warning("%s not found when trying to delete it", latest_log_directory_path, exc_info=True)
             elif (os.path.isdir(latest_log_directory_path) or
                       os.path.isfile(latest_log_directory_path)):
                 self.log.warning(
