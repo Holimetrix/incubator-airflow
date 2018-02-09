@@ -14,4 +14,4 @@
 #
 
 # https://www.python.org/dev/peps/pep-0440/#local-version-identifiers
-version = '1.9.0+hmx.2'
+version = '1.9.0+hmx.3'
