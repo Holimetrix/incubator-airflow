@@ -107,10 +107,10 @@ class FileProcessorHandler(logging.Handler):
                         os.unlink(latest_log_directory_path)
                         os.symlink(log_directory, latest_log_directory_path)
                     except:
-                        self.log.warning("%s not found when trying to delete it", latest_log_directory_path, exc_info=True)
+                        logging.warning("%s not found when trying to delete it", latest_log_directory_path)
             elif (os.path.isdir(latest_log_directory_path) or
                       os.path.isfile(latest_log_directory_path)):
-                self.log.warning(
+                logging.warning(
                     "%s already exists as a dir/file. Skip creating symlink.",
                     latest_log_directory_path
                 )
@@ -118,7 +118,7 @@ class FileProcessorHandler(logging.Handler):
                 try:
                     os.symlink(log_directory, latest_log_directory_path)
                 except:
-                    self.log.warning("exception when creating symlink", exc_info=True)
+                    logging.warning("exception when creating symlink")
 
     def _init_file(self, filename):
         """
